@@ -9,9 +9,12 @@ const categoryRoutes = require("./routes/category");
 const subcategoryRoutes = require("./routes/subcategory");
 const labCategoryRoutes = require("./routes/labCategory");
 const productRoutes = require("./routes/product");
+const fetch = require('node-fetch'); // ✅ For node-fetch v2
 
 // Initialize express app
 const app = express();
+
+const SELF_URL = "https://spancotekbackend.onrender.com/";
 
 // Middleware
 app.use(cors());
@@ -52,6 +55,16 @@ app.use("*", (req, res) => {
 
 // Server port
 const PORT = process.env.PORT || 5000;
+
+// Ping every 14 minutes to keep Render awake
+setInterval(async () => {
+  try {
+    const res = await fetch(SELF_URL);
+    console.log(`Self-ping status: ${res.status} at ${new Date().toISOString()}`);
+  } catch (err) {
+    console.error("Self-ping failed:", err.message);
+  }
+}, 14 * 60 * 1000);
 
 // Start server
 app.listen(PORT, () => {
