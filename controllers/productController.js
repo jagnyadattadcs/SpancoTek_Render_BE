@@ -1,4 +1,3 @@
-
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 const Subcategory = require("../models/Subcategory");
@@ -9,7 +8,7 @@ exports.getProducts = async (req, res) => {
   try {
     const {
       page = 1,
-      limit = 10,
+      limit = 1000,
       search = "",
       category,
       subCategory,
@@ -85,7 +84,7 @@ exports.getProductsByCategory = async (req, res) => {
     const { categoryId } = req.params;
     const {
       page = 1,
-      limit = 10,
+      limit = 1000,
       search = "",
       sortBy = "name",
       sortOrder = "asc",
@@ -166,7 +165,7 @@ exports.getProductsBySubcategory = async (req, res) => {
     const { subCategoryId } = req.params;
     const {
       page = 1,
-      limit = 50,
+      limit = 1000,
       search = "",
       sortBy = "name",
       sortOrder = "asc",
@@ -250,7 +249,7 @@ exports.getProductsByLabCategory = async (req, res) => {
     const { labCategoryId } = req.params;
     const {
       page = 1,
-      limit = 10,
+      limit = 1000,
       search = "",
       sortBy = "name",
       sortOrder = "asc",
