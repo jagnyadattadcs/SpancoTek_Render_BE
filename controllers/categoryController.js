@@ -3,13 +3,54 @@ const Subcategory = require("../models/Subcategory");
 const { cloudinary } = require("../config/cloudinary");
 
 // Get all categories
+// exports.getAllCategories = async (req, res) => {
+//     try {
+//         const categories = await Category.find().sort({ createdAt: -1 });
+//         res.json(categories);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// };
+
+// Get all categories (controller-only custom order)
 exports.getAllCategories = async (req, res) => {
-    try {
-        const categories = await Category.find().sort({ createdAt: -1 });
-        res.json(categories);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const categories = await Category.find(); // no sorting here
+
+    // desired order (server-side). Add variants to handle typos.
+    const customOrder = [
+      "Higher Education",
+      "Engineering",
+      "Skill Development",
+      "Research",
+    ];
+
+    // Build index map for fast lookup
+    const orderIndex = new Map();
+    customOrder.forEach((name, idx) => {
+      // map case-insensitive name to index
+      orderIndex.set(name.toLowerCase(), idx);
+    });
+
+    const sorted = categories.slice().sort((a, b) => {
+      const ai = orderIndex.has((a.name || "").toLowerCase())
+        ? orderIndex.get(a.name.toLowerCase())
+        : Number.MAX_SAFE_INTEGER;
+      const bi = orderIndex.has((b.name || "").toLowerCase())
+        ? orderIndex.get(b.name.toLowerCase())
+        : Number.MAX_SAFE_INTEGER;
+      // if both have the same index (not in custom order), keep original relative order by createdAt desc fallback
+      if (ai === bi) {
+        // fallback: newest first
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      }
+      return ai - bi;
+    });
+
+    res.json(sorted);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // Get single category
